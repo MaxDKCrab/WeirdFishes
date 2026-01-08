@@ -5,7 +5,7 @@ public class BoxSelectionUI : MonoBehaviour
 {
     private RTSInput input;
     
-    [SerializeField] private GameObject boxSelectUI;
+    public GameObject boxSelectUI;
 
     private RectTransform boxSelectUITransform;
 

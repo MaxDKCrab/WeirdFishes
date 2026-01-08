@@ -4,29 +4,31 @@ using UnityEngine;
 
 public class RTSPlayer : MonoBehaviour
 {
-    List<UnitBase> SelectedUnits = new  List<UnitBase>();
+    List<RtsEntityBase> SelectedEntities = new  List<RtsEntityBase>();
     [SerializeField] Camera rtsCam;
     public LayerMask selectionLayer;
     public LayerMask groundLayer;
-
+    BoxSelectionUI boxSelectionUI;
     private Vector3 gizmoCenter;
     private Vector3 gizmoSize;
-
-    public float boxTightening;
     
+
+// handle this reff and information better later
+    private void Start()
+    {
+        boxSelectionUI = gameObject.GetComponent<BoxSelectionUI>();
+    }
+
     public void TryBoxSelect(Vector2 start, Vector2 end)
     {
-        DeselectUnit();
+        DeselectEntity();
         
         Physics.Raycast(rtsCam.ScreenPointToRay(start), out RaycastHit startHit, Mathf.Infinity,groundLayer);
         Physics.Raycast(rtsCam.ScreenPointToRay(end), out RaycastHit endHit, Mathf.Infinity,groundLayer);
         
-        
         float width = Mathf.Abs(endHit.point.x - startHit.point.x);
         float height = Mathf.Abs(endHit.point.z - startHit.point.z);
         
-        width -= boxTightening;
-        height -= boxTightening;
 
         Vector3 center = (startHit.point + endHit.point) * 0.5f;
         
@@ -34,13 +36,23 @@ public class RTSPlayer : MonoBehaviour
         
         gizmoCenter = center;
         gizmoSize = new Vector3(width, 5f,height );
+
+        RectTransform rect = boxSelectionUI.boxSelectUI.GetComponent<RectTransform>();
+        
+        Vector2 min = rect.anchoredPosition - (rect.sizeDelta / 2);
+        Vector2 max = rect.anchoredPosition + (rect.sizeDelta / 2);
         
         foreach (Collider obj in found)
         {
             Debug.Log(obj.gameObject.name);
-            if (obj.TryGetComponent(out UnitBase unit))
+            if (obj.TryGetComponent(out RtsEntityBase entity))
             {
-                AddToSelection(unit);
+                Vector3 screenPos = rtsCam.WorldToScreenPoint(obj.transform.position);
+
+                if (screenPos.x > min.x && screenPos.x < max.x && screenPos.y > min.y && screenPos.y < max.y)
+                {
+                    AddToSelection(entity);
+                }
             }
         }
     }
@@ -53,51 +65,94 @@ public class RTSPlayer : MonoBehaviour
 
     public void TrySelectAtLocation(Vector2 mouseLocation)
     {
-        DeselectUnit();
+        DeselectEntity();
 
         Ray ray = rtsCam.ScreenPointToRay(mouseLocation);
         
         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, selectionLayer))
         {
-            if (hit.collider.TryGetComponent(out UnitBase unit))
+            if (hit.collider.TryGetComponent(out RtsEntityBase entity))
             {
-                SelectUnit(unit);
+                SelectEntity(entity);
             }
         }
         
     }
 
+
+    enum CommandType
+    {
+        OnEntity = 1,
+        OnGround = 2,
+        OnNothing = 3,
+    }
+    
     public void TryCommandAtLocation(Vector2 mouseLocation)
     {
+        Ray ray = rtsCam.ScreenPointToRay(mouseLocation);
         
+        CommandType command = CommandType.OnNothing;
+        RtsEntityBase targetRtsEntity = null;
+        Vector3 targetPosition = new Vector3(0,0,0);
+        
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, selectionLayer))
+        {
+            if (hit.collider.TryGetComponent(out RtsEntityBase entity))
+            {
+                command = CommandType.OnEntity;
+                targetRtsEntity = entity;
+            }
+            else
+            {
+                command = CommandType.OnGround;
+                targetPosition = hit.point;
+            }
+        }
+        
+
+        foreach (var entity in SelectedEntities)
+        {
+            switch (command)
+            {
+                case CommandType.OnEntity:
+                    entity.CommandOnEntity(targetRtsEntity);
+                    break;
+                case CommandType.OnGround:
+                    entity.CommandOnGround(targetPosition);
+                    break;
+                case CommandType.OnNothing:
+                    entity.CommandOnNothing();
+                    break;
+            }    
+        }
     }
     
-    void SelectUnit(UnitBase unit)
+    void SelectEntity(RtsEntityBase rtsEntity)
     {
         Debug.Log("SelectUnit");
-        DeselectUnit();
-        SelectedUnits.Add(unit);
-        unit.OnSelected();
+        DeselectEntity();
+        SelectedEntities.Add(rtsEntity);
+        rtsEntity.OnSelected();
     }
 
-    void DeselectUnit(UnitBase unit)
+    void DeselectEntity(RtsEntityBase rtsEntity)
     {
-        SelectedUnits.Remove(unit);
-        unit.OnDeselected();
+        SelectedEntities.Remove(rtsEntity);
+        rtsEntity.OnDeselected();
     }
     
-    void DeselectUnit()
+    void DeselectEntity()
     {
-        foreach (var unit in SelectedUnits)
+        foreach (var entity in SelectedEntities)
         {
-            unit.OnDeselected();
+            entity.OnDeselected();
         }
-        SelectedUnits.Clear();
+        SelectedEntities.Clear();
     }
 
-    void AddToSelection(UnitBase unit)
+    void AddToSelection(RtsEntityBase rtsEntity)
     {
-        SelectedUnits.Add(unit);
-        unit.OnSelected();
+        SelectedEntities.Add(rtsEntity);
+        rtsEntity.OnSelected();
     }
 }

@@ -255727,7 +255727,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  boxTightening: 8
 --- !u!114 &2134486112
 MonoBehaviour:
   m_ObjectHideFlags: 0
