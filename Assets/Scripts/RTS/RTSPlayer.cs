@@ -7,10 +7,13 @@ public class RTSPlayer : MonoBehaviour
     List<RtsEntityBase> SelectedEntities = new  List<RtsEntityBase>();
     [SerializeField] Camera rtsCam;
     public LayerMask selectionLayer;
+    public LayerMask commandLayers;
     public LayerMask groundLayer;
     BoxSelectionUI boxSelectionUI;
     private Vector3 gizmoCenter;
     private Vector3 gizmoSize;
+
+    public bool debugVisuals;
     
 
 // handle this reff and information better later
@@ -59,6 +62,7 @@ public class RTSPlayer : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (!debugVisuals) return;
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(gizmoCenter, gizmoSize);
     }
@@ -95,8 +99,9 @@ public class RTSPlayer : MonoBehaviour
         RtsEntityBase targetRtsEntity = null;
         Vector3 targetPosition = new Vector3(0,0,0);
         
-        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, selectionLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, commandLayers))
         {
+            Debug.Log("Command ray hit: " + hit.collider.gameObject.name);
             if (hit.collider.TryGetComponent(out RtsEntityBase entity))
             {
                 command = CommandType.OnEntity;
@@ -118,6 +123,7 @@ public class RTSPlayer : MonoBehaviour
                     entity.CommandOnEntity(targetRtsEntity);
                     break;
                 case CommandType.OnGround:
+                    Debug.Log("Player CommandOnGround");
                     entity.CommandOnGround(targetPosition);
                     break;
                 case CommandType.OnNothing:
@@ -125,6 +131,8 @@ public class RTSPlayer : MonoBehaviour
                     break;
             }    
         }
+        
+        Debug.Log("Tried Command");
     }
     
     void SelectEntity(RtsEntityBase rtsEntity)

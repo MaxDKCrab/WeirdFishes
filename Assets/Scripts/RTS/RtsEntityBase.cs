@@ -1,10 +1,22 @@
+using System;
 using UnityEngine;
 
 public class RtsEntityBase : MonoBehaviour
 {
     public bool allied;
-    public RTSPlayer player;
+    //public RTSPlayer player;
     [SerializeField] private GameObject selectedVisual;
+
+
+    private void Start()
+    {
+        Initialize();
+    }
+
+    public virtual void Initialize()
+    {
+        
+    }
 
     public void OnSelected()
     {
@@ -24,6 +36,7 @@ public class RtsEntityBase : MonoBehaviour
 
     public virtual bool CommandOnGround(Vector3 pos)
     {
+        Debug.Log("Entity CommandOnGround");
         return allied; 
     }
 
