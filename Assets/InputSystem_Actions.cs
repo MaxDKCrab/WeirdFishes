@@ -634,6 +634,24 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""MoveCam"",
+                    ""type"": ""Value"",
+                    ""id"": ""a701936d-f0f9-4776-ba94-fd44b7145480"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Zoom"",
+                    ""type"": ""Value"",
+                    ""id"": ""6594d7fc-94b2-434b-9f7c-ecf10490ff3d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -667,6 +685,72 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MousePos"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""639e2c6b-2e1f-4120-b83e-6988c9ac309e"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCam"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""d7f3198e-5b93-4280-b2c6-791481e5a242"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCam"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""8ee824a5-8a8f-48d8-a404-6dff8e6061e0"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCam"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""19630689-e6f7-48c1-a630-6af3bebb2e0b"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCam"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""55bc9dc3-bc1c-4f99-ab0c-7b54eb3f54fd"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCam"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9b4d485e-0ac3-485c-871b-7a758b472fc2"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Zoom"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -781,6 +865,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_RTSActions_LMB = m_RTSActions.FindAction("LMB", throwIfNotFound: true);
         m_RTSActions_RMB = m_RTSActions.FindAction("RMB", throwIfNotFound: true);
         m_RTSActions_MousePos = m_RTSActions.FindAction("MousePos", throwIfNotFound: true);
+        m_RTSActions_MoveCam = m_RTSActions.FindAction("MoveCam", throwIfNotFound: true);
+        m_RTSActions_Zoom = m_RTSActions.FindAction("Zoom", throwIfNotFound: true);
         // MainGameActions
         m_MainGameActions = asset.FindActionMap("MainGameActions", throwIfNotFound: true);
         m_MainGameActions_Newaction = m_MainGameActions.FindAction("New action", throwIfNotFound: true);
@@ -1064,6 +1150,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_RTSActions_LMB;
     private readonly InputAction m_RTSActions_RMB;
     private readonly InputAction m_RTSActions_MousePos;
+    private readonly InputAction m_RTSActions_MoveCam;
+    private readonly InputAction m_RTSActions_Zoom;
     /// <summary>
     /// Provides access to input actions defined in input action map "RTSActions".
     /// </summary>
@@ -1087,6 +1175,14 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "RTSActions/MousePos".
         /// </summary>
         public InputAction @MousePos => m_Wrapper.m_RTSActions_MousePos;
+        /// <summary>
+        /// Provides access to the underlying input action "RTSActions/MoveCam".
+        /// </summary>
+        public InputAction @MoveCam => m_Wrapper.m_RTSActions_MoveCam;
+        /// <summary>
+        /// Provides access to the underlying input action "RTSActions/Zoom".
+        /// </summary>
+        public InputAction @Zoom => m_Wrapper.m_RTSActions_Zoom;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1122,6 +1218,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @MousePos.started += instance.OnMousePos;
             @MousePos.performed += instance.OnMousePos;
             @MousePos.canceled += instance.OnMousePos;
+            @MoveCam.started += instance.OnMoveCam;
+            @MoveCam.performed += instance.OnMoveCam;
+            @MoveCam.canceled += instance.OnMoveCam;
+            @Zoom.started += instance.OnZoom;
+            @Zoom.performed += instance.OnZoom;
+            @Zoom.canceled += instance.OnZoom;
         }
 
         /// <summary>
@@ -1142,6 +1244,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @MousePos.started -= instance.OnMousePos;
             @MousePos.performed -= instance.OnMousePos;
             @MousePos.canceled -= instance.OnMousePos;
+            @MoveCam.started -= instance.OnMoveCam;
+            @MoveCam.performed -= instance.OnMoveCam;
+            @MoveCam.canceled -= instance.OnMoveCam;
+            @Zoom.started -= instance.OnZoom;
+            @Zoom.performed -= instance.OnZoom;
+            @Zoom.canceled -= instance.OnZoom;
         }
 
         /// <summary>
@@ -1442,6 +1550,20 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMousePos(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MoveCam" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMoveCam(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Zoom" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnZoom(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "MainGameActions" which allows adding and removing callbacks.

@@ -5,9 +5,12 @@ using UnityEngine.InputSystem;
 public class RTSInput : MonoBehaviour
 {
     RTSPlayer player;
+    public RTSCam rtscam;
     
     InputAction LMBAction;
     InputAction RMBAction;
+    private InputAction MoveCamAction;
+    private InputAction ZoomCamAction;
     
     [HideInInspector] public Vector2 mousePos;
 
@@ -29,7 +32,8 @@ public class RTSInput : MonoBehaviour
         
         LMBAction = InputSystem.actions.FindAction("LMB");
         RMBAction = InputSystem.actions.FindAction("RMB");
-        
+        MoveCamAction = InputSystem.actions.FindAction("MoveCam");
+        ZoomCamAction = InputSystem.actions.FindAction("Zoom");
         LMBAction.performed += LMBActionOnPerformed;
         RMBAction.performed += RMBActionOnPerformed;
     }
@@ -59,6 +63,10 @@ public class RTSInput : MonoBehaviour
     void Update()
     {
         mousePos = InputSystem.actions.FindAction("MousePos").ReadValue<Vector2>();
+        
+        rtscam.MoveCam(MoveCamAction.ReadValue<Vector2>());
+        rtscam.ZoomCam(ZoomCamAction.ReadValue<float>());
+        
         
         if (LMBAction.inProgress) HandleBoxSelect();
     }

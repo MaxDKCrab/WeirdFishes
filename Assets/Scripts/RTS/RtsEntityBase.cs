@@ -6,6 +6,7 @@ public class RtsEntityBase : MonoBehaviour
     public bool allied;
     //public RTSPlayer player;
     [SerializeField] private GameObject selectedVisual;
+    public int UiPriority;
 
 
     private void Start()
